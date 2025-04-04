@@ -113,16 +113,19 @@ jobs:
       - name: Deploy or Update Deployment
         if: ${{ env.AKS_NAME != '' }}
         run: |
-          DEPLOYMENT_NAME="swiftcart-frontend" 
+            DEPLOYMENT_NAME="swiftcart-frontend"
+            NAMESPACE="default"
 
-          NAMESPACE="default"
-
-
-          if kubectl get deployment "$DEPLOYMENT_NAME" -n "$NAMESPACE"
-          >/dev/null 2>&1; then
-              echo "Deployment '$DEPLOYMENT_NAME' exists. Performing rollout restart..."
-              kubectl rollout restart deployment/"$DEPLOYMENT_NAME" -n "$NAMESPACE"
-          else
-              echo "Deployment '$DEPLOYMENT_NAME' does not exist. Deploying..."
-              kubectl apply -f ./manifest
-          fi
+            # Try to get the deployment and check for the exit code
+            if kubectl get deployment "$DEPLOYMENT_NAME" -n "$NAMESPACE" >/dev/null 2>&1; then
+                echo "Deployment '$DEPLOYMENT_NAME' exists. Performing rollout restart..."
+                kubectl rollout restart deployment/"$DEPLOYMENT_NAME" -n "$NAMESPACE"
+            else
+                if kubectl get deployment "$DEPLOYMENT_NAME" -n "$NAMESPACE" 2>&1 | grep -q "not found"; then
+                    echo "Deployment '$DEPLOYMENT_NAME' does not exist. Deploying..."
+                    kubectl apply -f ./manifest
+                else
+                    echo "An unexpected error occurred while checking deployment status."
+                    exit 1
+                fi
+            fi
