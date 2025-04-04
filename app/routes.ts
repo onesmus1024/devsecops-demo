@@ -8,5 +8,4 @@ export default [
     ]),
     route("/checkout", "./routes/checkout.tsx"),
     route("/orders", "./routes/orders.tsx"),
-
 ] satisfies RouteConfig;
