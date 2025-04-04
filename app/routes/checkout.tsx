@@ -117,8 +117,7 @@ function CheckoutPage() {
 
                 {/* Action Button */}
                 <div className="text-center">
-                    <button
-                        className="btn btn-primary btn-wide" // DaisyUI button styles
+                    <button className="btn btn-primary btn-wide" // DaisyUI button styles
                         onClick={handlePlaceOrder}
                     >
                         Place Order
