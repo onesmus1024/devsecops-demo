@@ -36,11 +36,18 @@ jobs:
           id: get-acr
           run: |
             ACR_NAME=$(az acr list --query "[?contains(name, 'swiftcart')].name" -o tsv)
-            ACR_SERVER=$(az acr show --name $ACR_NAME --query "loginServer" -o tsv)
-            echo "ACR_SERVER=$ACR_SERVER" >> $GITHUB_ENV
-            echo "ACR_NAME=$ACR_NAME" >> $GITHUB_ENV
-            echo "ACR_NAME: $ACR_NAME"
-            echo "ACR_SERVER: $ACR_SERVER"
+
+            if [ -z "$ACR_NAME" ]; then
+                echo "No ACR found containing 'swiftcart'. Exiting."
+            else
+                ACR_SERVER=$(az acr show --name "$ACR_NAME" --query "loginServer" -o tsv)
+
+                echo "ACR_SERVER=$ACR_SERVER" >> $GITHUB_ENV
+                echo "ACR_NAME=$ACR_NAME" >> $GITHUB_ENV
+                echo "ACR_NAME: $ACR_NAME"
+                echo "ACR_SERVER: $ACR_SERVER"
+            fi
+
         
         - name : Show ACR name and server
           run: |
