@@ -81,11 +81,7 @@ jobs:
                 push: true
                 tags: '${{ env.ACR_SERVER }}/swiftcart-frontend:latest'
                 file: Dockerfile
-        - name: Update deployment file
-          run: |
-         
-            sed -i 's/<ACR_NAME>/${{ env.ACR_NAME }}/' manifest/deployment.yaml
-   
+  
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
@@ -93,6 +89,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Update deployment file
+        run: |
+          sed -i 's/<ACR_NAME>/${{ env.ACR_NAME }}/' manifest/deployment.yaml
+   
 
       - name: Azure Login
         uses: azure/login@v1
