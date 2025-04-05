@@ -105,7 +105,8 @@ jobs:
 
       - name: Update deployment file
         run: |
-          sed -i 's/<ACR_NAME>/${{ env.ACR_NAME }}/' manifest/deployment.yaml
+          sed -i "s|<ACR_NAME>|$ACR_NAME|" manifest/deployment.yaml
+
    
 
       - name: Connect to cluster
