@@ -117,7 +117,6 @@ jobs:
         run: |
           sed -i "s|<ACR_NAME>|${{steps.get-acr.outputs.ACR_NAME}}|" manifest/deployment.yaml
 
-   
 
       - name: Connect to cluster
         if: ${{ env.AKS_NAME != '' }}
