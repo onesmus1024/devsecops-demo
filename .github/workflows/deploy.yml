@@ -102,7 +102,8 @@ jobs:
         run: |
           # Find AKS that contains 'swiftcart' in the name
           AKS_NAME=$(az aks list --query "[?contains(name, 'Swiftcart')].name" -o tsv)
-          echo "::set-output name=ACR_NAME::$ACR_NAME"
+          echo "AKS_NAME=$AKS_NAME" >> $GITHUB_ENV
+          echo "AKS_NAME: $AKS_NAME"
 
 
       - name: Get ACR name and login server (contains 'swiftcart')
