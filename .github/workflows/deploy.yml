@@ -101,17 +101,19 @@ jobs:
         run: |
           # Find AKS that contains 'swiftcart' in the name
           AKS_NAME=$(az aks list --query "[?contains(name, 'Swiftcart')].name" -o tsv)
-          echo "AKS_NAME=$AKS_NAME" >> $GITHUB_ENV
+          echo "::set-output name=ACR_NAME::$ACR_NAME"
+
 
       - name: Get ACR name and login server (contains 'swiftcart')
         id: get-acr
         run: |
           ACR_NAME=$(az acr list --query "[?contains(name, 'swiftcart')].name" -o tsv)
+          echo "::set-output name=ACR_NAME::$ACR_NAME"
 
 
       - name: Update deployment file
         run: |
-          sed -i "s|<ACR_NAME>|$ACR_NAME|" manifest/deployment.yaml
+          sed -i "s|<ACR_NAME>|${{steps.get-acr.outputs.ACR_NAME}}|" manifest/deployment.yaml
 
    
 
