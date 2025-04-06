@@ -3,6 +3,7 @@ name: Deploy to Azure Kubernetes Service
   push:
     branches:
       - master
+  workflow_dispatch:
       
 env:
   Tag: echo "IMAGE_TAG=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
