@@ -3,14 +3,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: swiftcart-frontend
-  labels:
-    app: swiftcart-frontend
+  name: ${AKS_APP_NAME}
+  namespace: ${AKS_NAMESPACE}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: swiftcart-frontend
+       app: ${AKS_APP_NAME}
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -19,11 +18,12 @@ spec:
   template:
     metadata:
       labels:
-        app: swiftcart-frontend
+        app: ${AKS_APP_NAME}
     spec:
+      serviceAccountName: ${AKS_SERVICE_ACCOUNT}
       containers:
-      - name: swiftcart-frontend
-        image: <ACR_NAME>.azurecr.io/swiftcart-frontend:latest
+      - name: ${AKS_APP_NAME}
+        image:  ${IMAGE_NAME}
         ports:
         - containerPort: 3000
        
@@ -33,12 +33,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: svc-swiftcart-frontend
+  name: ${AKS_SERVICE}
+  namespace: ${AKS_NAMESPACE}
 spec:
+  type: LoadBalancer
   ports:
-    - name: http
-      protocol: TCP
       port: 80
       targetPort: 3000
   selector:
-    app: swiftcart-frontend
+    app: ${AKS_APP_NAME}

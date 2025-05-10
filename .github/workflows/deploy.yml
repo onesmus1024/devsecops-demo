@@ -7,6 +7,19 @@ name: Deploy to Azure Kubernetes Service
       
 env:
   Tag: echo "IMAGE_TAG=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+  AZURE_CONTAINER_REGISTRY: "webapps"
+  CONTAINER_NAME: "webapp1"
+  AZ_RESOURCE_GROUP: "webapps"
+  AZ_AKS_CLUSTER: "webapps"
+  APP_MANIFEST_DIR: azure/aks/deploy/manifest/webapp1
+  AZ_REGION: eastus
+  AZ_CONTAINER_REGISTRY: flaskwebapps
+  APP_NAME: webapp1
+  AKS_APP_NAME: "webapp1"
+  AKS_SERVICE: "webapp1"
+  AKS_SERVICE_ACCOUNT: "webapp1-sa"
+  AKS_NAMESPACE: "webapp"
+  GITHUB_SHA: ${{ github.sha }}
 jobs:
   test:
     name: Test
@@ -33,13 +46,13 @@ jobs:
           with:
             creds: '${{ secrets.AZURE_CREDENTIALS }}'
 
-        - name: Get ACR name and login server (contains 'swiftcart')
+        - name: Get ACR name and login server (contains 'acrdevsecopsuksouth')
           id: get-acr
           run: |
-            ACR_NAME=$(az acr list --query "[?contains(name, 'swiftcart')].name" -o tsv)
+            ACR_NAME=$(az acr list --query "[?contains(name, 'acrdevsecopsuksouth')].name" -o tsv)
 
             if [ -z "$ACR_NAME" ]; then
-                echo "No ACR found containing 'swiftcart'. Exiting."
+                echo "No ACR found containing 'acrdevsecopsuksouth'. Exiting."
             else
                 ACR_SERVER=$(az acr show --name "$ACR_NAME" --query "loginServer" -o tsv)
 
@@ -80,8 +93,15 @@ jobs:
           uses: docker/build-push-action@v2
           with:
                 push: true
-                tags: '${{ env.ACR_SERVER }}/swiftcart-frontend:latest'
+                tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ env.GITHUB_SHA }} 
                 file: Dockerfile
+        - name : Container Scan
+          if: ${{ env.ACR_NAME != '' }}
+          uses: azure/container-scan@v0
+          with:
+            image-name: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ env.GITHUB_SHA }} 
+            username: ${{ env.ACR_USERNAME }}
+            password: ${{ env.ACR_PASSWORD }}
   
   deploy:
     name: Deploy
@@ -97,25 +117,25 @@ jobs:
         uses: azure/login@v1
         with:
           creds: '${{ secrets.AZURE_CREDENTIALS }}'
-      - name: Get AKS name that contains 'swiftcart'
+      - name: Get AKS name that contains 'aks-devsecops-uk-south'
         id: get-aks
         run: |
-          # Find AKS that contains 'swiftcart' in the name
-          AKS_NAME=$(az aks list --query "[?contains(name, 'Swiftcart')].name" -o tsv)
+          # Find AKS that contains 'aks-devsecops-uk-south' in the name
+          AKS_NAME=$(az aks list --query "[?contains(name, 'aks-devsecops-uk-south')].name" -o tsv)
           echo "AKS_NAME=$AKS_NAME" >> $GITHUB_ENV
           echo "AKS_NAME: $AKS_NAME"
 
 
-      - name: Get ACR name and login server (contains 'swiftcart')
+      - name: Get ACR name and login server (contains 'aks-devsecops-uk-south')
         id: get-acr
         run: |
-          ACR_NAME=$(az acr list --query "[?contains(name, 'swiftcart')].name" -o tsv)
+          ACR_NAME=$(az acr list --query "[?contains(name, 'aks-devsecops-uk-south')].name" -o tsv)
           echo "::set-output name=ACR_NAME::$ACR_NAME"
 
 
-      - name: Update deployment file
-        run: |
-          sed -i "s|<ACR_NAME>|${{steps.get-acr.outputs.ACR_NAME}}|" manifest/deployment.yaml
+      # - name: Update deployment file
+      #   run: |
+      #     sed -i "s|<ACR_NAME>|${{steps.get-acr.outputs.ACR_NAME}}|" manifest/deployment.yaml
 
 
       - name: Connect to cluster
@@ -124,21 +144,26 @@ jobs:
         run: |
           az aks get-credentials --resource-group swiftcart-rg --name ${{env.AKS_NAME }}
       - name: Deploy or Update Deployment
+        working-directory: ${{env.APP_MANIFEST_DIR}}
+        env: 
+          IMAGE_NAME: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ env.GITHUB_SHA }}
         if: ${{ env.AKS_NAME != '' }}
         run: |
-            DEPLOYMENT_NAME="swiftcart-frontend"
-            NAMESPACE="default"
-
-            # Try to get the deployment and check for the exit code
-            if kubectl get deployment "$DEPLOYMENT_NAME" -n "$NAMESPACE" >/dev/null 2>&1; then
-                echo "Deployment '$DEPLOYMENT_NAME' exists. Performing rollout restart..."
-                kubectl rollout restart deployment/"$DEPLOYMENT_NAME" -n "$NAMESPACE"
-            else
-                if kubectl get deployment "$DEPLOYMENT_NAME" -n "$NAMESPACE" 2>&1 | grep -q "not found"; then
-                    echo "Deployment '$DEPLOYMENT_NAME' does not exist. Deploying..."
-                    kubectl apply -f ./manifest
-                else
-                    echo "An unexpected error occurred while checking deployment status."
-                    exit 1
-                fi
-            fi
+       
+            envsubst < deployment.yaml | kubectl apply -f -
+            envsubst < namespace.yaml | kubectl apply -f -
+            kubectl get pods -o wide
+            kubectl get svc -o wide 
+            sleep 60
+      
+      - name: Notify Slack
+        uses: ravsamhq/notify-slack-action@v2
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CI_HOOK }}
+        with:
+          status: ${{ job.status }}
+          notification_title: "{workflow}:{job} has {status_message}"
+          message_format: "{emoji} *{workflow}:{job}* {status_message} in <{repo_url}|{repo}>"
+          footer: "Logs <{run_url}|{job}>"
+          notify_when: "failure,success" 
