@@ -150,8 +150,8 @@ jobs:
         if: ${{ env.AKS_NAME != '' }}
         run: |
        
-            envsubst < deployment.yaml | kubectl apply -f -
             envsubst < namespace.yaml | kubectl apply -f -
+            envsubst < deployment.yaml | kubectl apply -f -
             kubectl get pods -o wide
             kubectl get svc -o wide 
             sleep 60
