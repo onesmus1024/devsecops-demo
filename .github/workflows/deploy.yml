@@ -150,9 +150,12 @@ jobs:
        
             envsubst < namespace.yaml | kubectl apply -f -
             envsubst < deployment.yaml | kubectl apply -f -
-            # kubectl get pods -o wide
-            # kubectl get svc -o wide 
-            # sleep 60
+
+            cat deployment.yaml
+            cat namespace.yaml
+            kubectl get pods -o wide
+            kubectl get svc -o wide 
+            sleep 60
       
       - name: Notify Slack
         uses: ravsamhq/notify-slack-action@v2
