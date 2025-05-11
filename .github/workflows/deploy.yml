@@ -150,9 +150,6 @@ jobs:
        
             envsubst < namespace.yaml | kubectl apply -f -
             envsubst < deployment.yaml | kubectl apply -f -
-
-            cat deployment.yaml
-            cat namespace.yaml
             kubectl get pods -o wide
             kubectl get svc -o wide 
             sleep 60
