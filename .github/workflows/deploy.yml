@@ -8,9 +8,9 @@ name: Deploy to Azure Kubernetes Service
 env:
   Tag: echo "IMAGE_TAG=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
   AZURE_CONTAINER_REGISTRY: "acrdevsecopsuksouth"
-  CONTAINER_NAME: "aks-devsecops-uk-south"
+  CONTAINER_NAME: "webapp1"
   AZ_RESOURCE_GROUP: "rg-devsecops-uk-south"
-  AZ_AKS_CLUSTER: "webapps"
+  AZ_AKS_CLUSTER: "aks-devsecops-uk-south"
   APP_MANIFEST_DIR: manifest
   APP_NAME: webapp1
   AKS_APP_NAME: "webapp1"
