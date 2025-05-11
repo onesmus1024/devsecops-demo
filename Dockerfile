@@ -8,7 +8,7 @@ RUN npm ci
 FROM node:20-alpine AS production-dependencies-env
 WORKDIR /app
 COPY ./package.json package-lock.json /app/
-RUN npm ci --omit=dev
+RUN npm ci --omit=dev --force
 
 # Stage 3: Build the app
 FROM node:20-alpine AS build-env
