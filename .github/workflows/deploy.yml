@@ -7,13 +7,11 @@ name: Deploy to Azure Kubernetes Service
       
 env:
   Tag: echo "IMAGE_TAG=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
-  AZURE_CONTAINER_REGISTRY: "webapps"
-  CONTAINER_NAME: "webapp1"
-  AZ_RESOURCE_GROUP: "webapps"
+  AZURE_CONTAINER_REGISTRY: "acrdevsecopsuksouth"
+  CONTAINER_NAME: "aks-devsecops-uk-south"
+  AZ_RESOURCE_GROUP: "rg-devsecops-uk-south"
   AZ_AKS_CLUSTER: "webapps"
-  APP_MANIFEST_DIR: azure/aks/deploy/manifest/webapp1
-  AZ_REGION: eastus
-  AZ_CONTAINER_REGISTRY: flaskwebapps
+  APP_MANIFEST_DIR: manifest
   APP_NAME: webapp1
   AKS_APP_NAME: "webapp1"
   AKS_SERVICE: "webapp1"
