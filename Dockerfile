@@ -2,7 +2,7 @@
 FROM node:20-alpine AS development-dependencies-env
 WORKDIR /app
 COPY . /app
-RUN npm ci
+RUN npm ci --force
 
 # Stage 2: Install production dependencies only
 FROM node:20-alpine AS production-dependencies-env
