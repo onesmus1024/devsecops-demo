@@ -23,7 +23,7 @@ Run the following PowerShell script to set up the infrastructure:
 2. Add it to your repository secrets with the name:
 
 ```
-SLACK_WEBHOOK_URL
+SLACK_CI_HOOK
 ```
 
 ### ✅ Azure Credentials
