@@ -12,6 +12,7 @@ FROM node:22-alpine AS build-env
 COPY . /app/
 COPY --from=development-dependencies-env /app/node_modules /app/node_modules
 WORKDIR /app
+RUN npm install -g npm@11.3.0
 RUN npm run build
 
 FROM node:22-alpine
