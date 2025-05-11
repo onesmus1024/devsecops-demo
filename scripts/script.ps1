@@ -18,7 +18,8 @@ az acr create `
   --name $AZ_CONTAINER_REGISTRY `
   --resource-group $AZ_RESOURCE_GROUP `
   --location uksouth `
-  --sku Standard
+  --sku Standard `
+  --admin-enabled true
 
 # Create AKS cluster and attach ACR
 az aks create `

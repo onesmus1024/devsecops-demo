@@ -63,11 +63,12 @@ jobs:
             fi
 
         
-        - name : Update ACR to include admin credentials
-          if: ${{ env.ACR_NAME != '' }}
+        - name : Show ACR name and server
           run: |
-            # Enable admin user for ACR
-            az acr update --name $ACR_NAME --admin-enabled true
+              echo "ACR_NAME: $ACR_NAME"
+              echo "ACR_SERVER: $ACR_SERVER"
+              echo "ACR_NAME from env: ${{ env.ACR_NAME }}"
+              echo "ACR_SERVER from env: ${{ env.ACR_SERVER }}"
 
         - name: Get ACR credentials and store as secrets
           if: ${{ env.ACR_NAME != '' }}
