@@ -38,7 +38,7 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-      port: 80
+    - port: 80
       targetPort: 3000
   selector:
     app: ${AKS_APP_NAME}
