@@ -140,7 +140,7 @@ jobs:
         if: ${{ env.AKS_NAME != '' }}
         id: connect-to-cluster
         run: |
-          az aks get-credentials --resource-group swiftcart-rg --name ${{env.AKS_NAME }}
+          az aks get-credentials --resource-group ${{ env.AZ_RESOURCE_GROUP }} --name ${{ env.AZ_AKS_CLUSTER }} --overwrite-existing
       - name: Deploy or Update Deployment
         working-directory: ${{env.APP_MANIFEST_DIR}}
         env: 
