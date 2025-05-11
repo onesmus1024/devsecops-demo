@@ -19,7 +19,7 @@ Run the following PowerShell script to set up the infrastructure:
 
 ### ✅ Slack Webhook
 
-1. Generate a Slack webhook URL.
+1. Generate a Slack webhook URL at [Slack API](https://api.slack.com/messaging/webhooks).
 2. Add it to your repository secrets with the name:
 
 ```
@@ -31,7 +31,7 @@ SLACK_CI_HOOK
 Add the following secrets to your repository:
 
 - `AZURE_CREDENTIALS`
-- `AZURE_SUBSCRIPTION_ID`
+
 
 The `AZURE_CREDENTIALS` secret should have this JSON format:
 
