@@ -20,7 +20,30 @@ Run the following PowerShell script to set up the infrastructure:
 ### ✅ Slack Webhook
 
 1. Generate a Slack webhook URL at [Slack API](https://api.slack.com/messaging/webhooks).
-2. Add it to your repository secrets with the name:
+
+---
+
+### 🛠️ Create a Slack App
+
+1. Visit [Slack API Apps](https://api.slack.com/apps).
+2. Click **Create New App** → select **From scratch**.
+3. Name your app and choose your workspace.
+
+---
+
+### 🔌 Enable Incoming Webhooks
+
+1. In the app settings, go to **Features > Incoming Webhooks**.
+2. Toggle **Activate Incoming Webhooks** to **On**.
+3. Click **Add New Webhook to Workspace**.
+4. Choose a channel and authorize.
+5. Copy the generated **Webhook URL**.
+6. Add the webhook URL to your repository secrets.
+7. Name the secret `SLACK_CI_HOOK`.
+8. Go to your repository on GitHub.
+9. Click on **Settings**.
+10. In the left sidebar, click on **Secrets and variables** → **Actions**.
+11. Click on **New repository secret**.
 
 ```
 SLACK_CI_HOOK
